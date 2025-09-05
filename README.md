@@ -1,4 +1,5 @@
-<code>wget https://raw.githubusercontent.com/CangShui/VPS_ENV/main/vps.sh</code>
+<h3><code>bash <(curl -s https://raw.githubusercontent.com/CangShui/VPS_ENV/main/vps.sh)
+</code></h3>h3>
 
 
 
