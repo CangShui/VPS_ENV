@@ -42,4 +42,4 @@ done</pre>
 <pre>pip -V</pre>
 
 # 确认 python3.11 实际路径
-ls -l /usr/bin/python3 /usr/bin/python /usr/bin/pip3 /usr/bin/pip
+<pre>ls -l /usr/bin/python3 /usr/bin/python /usr/bin/pip3 /usr/bin/pip</pre>
