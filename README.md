@@ -4,7 +4,7 @@
 
 
 <h3>确认 sshd_config 生效</h3>
-grep -E "Port|PermitRootLogin|PasswordAuthentication" /etc/ssh/sshd_config</pre>
+<pre>grep -E "Port|PermitRootLogin|PasswordAuthentication" /etc/ssh/sshd_config</pre>
 
 <h3>查看当前拥塞控制算法</h3>
 <pre>sysctl net.ipv4.tcp_congestion_control</pre>
