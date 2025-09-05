@@ -1,3 +1,7 @@
+<code>wget https://raw.githubusercontent.com/CangShui/VPS_ENV/main/vps.sh</code>
+
+
+
 # 确认 sshd_config 生效
 grep -E "Port|PermitRootLogin|PasswordAuthentication" /etc/ssh/sshd_config
 
