@@ -18,8 +18,8 @@ for cmd in curl wget zip unzip iperf3 dig screen; do
 done
 
 <h3>检查网络工具</h3>
-dig debian.org
-iperf3 -v
+<pre>dig debian.org</pre>
+<pre>iperf3 -v</pre>
 
 
 <h3>查看 docker 是否运行</h3>
