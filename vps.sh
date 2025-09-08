@@ -36,20 +36,23 @@ else
 fi
 
 # --------------------------
-# 3. 更换 APT 源为 xtom
+# 3. 更换 APT 源
 # --------------------------
-echo "== 更换 APT 源为 xtom 镜像 =="
+echo "== 配置 APT 源 =="
 
 . /etc/os-release
 cp /etc/apt/sources.list /etc/apt/sources.list.bak.$(date +%Y%m%d-%H%M%S)
 
 case "$VERSION_ID" in
   10)
+    echo "检测到 Debian 10 (buster)，该版本已停止维护，使用 archive 源"
     cat >/etc/apt/sources.list <<EOF
-deb http://mirrors.xtom.com/debian buster main contrib non-free
-deb http://mirrors.xtom.com/debian buster-updates main contrib non-free
-deb http://mirrors.xtom.com/debian-security buster/updates main contrib non-free
+deb http://archive.debian.org/debian buster main contrib non-free
+deb http://archive.debian.org/debian buster-updates main contrib non-free
+deb http://archive.debian.org/debian-security buster/updates main contrib non-free
 EOF
+    # 禁用 Valid-Until 校验
+    echo 'Acquire::Check-Valid-Until "false";' >/etc/apt/apt.conf.d/99ignore-valid-until
     ;;
   11)
     cat >/etc/apt/sources.list <<EOF
@@ -67,7 +70,7 @@ EOF
     ;;
 esac
 
-apt-get update -y
+apt-get update -y || true
 
 # --------------------------
 # 4. 安装常用工具
