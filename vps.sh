@@ -41,8 +41,19 @@ echo "SSH 已重启，端口改为 44443"
 echo "== 开启 TCP BBR =="
 
 cat <<EOF >/etc/sysctl.d/99-bbr.conf
-net.core.default_qdisc=fq
-net.ipv4.tcp_congestion_control=bbr
+# 启用 BBR 拥塞控制
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+
+# 增大缓冲区，提升跨境链路吞吐
+net.core.rmem_max = 33554432
+net.core.wmem_max = 33554432
+net.ipv4.tcp_rmem = 4096 87380 33554432
+net.ipv4.tcp_wmem = 4096 16384 33554432
+
+# 开启路由转发（透明代理需要）
+net.ipv4.ip_forward = 1
+net.ipv6.conf.all.forwarding = 1
 EOF
 
 sysctl --system >/dev/null
