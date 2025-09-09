@@ -4,6 +4,23 @@ set -e
 echo "== 开始 VPS 初始化 =="
 
 # --------------------------
+# 0. 先询问 Docker / Python 是否安装
+# --------------------------
+echo "== 是否安装 Docker 环境？ =="
+echo "   1) 安装"
+echo "   2) 跳过"
+echo -n "请输入选择 [默认 1，10 秒后自动安装]: "
+read -t 10 choice_docker || choice_docker=1
+[ -z "$choice_docker" ] && choice_docker=1
+
+echo "== 是否编译安装 Python3.11 + pip3？ =="
+echo "   1) 安装"
+echo "   2) 跳过"
+echo -n "请输入选择 [默认 1，10 秒后自动安装]: "
+read -t 10 choice_py || choice_py=1
+[ -z "$choice_py" ] && choice_py=1
+
+# --------------------------
 # 1. 配置 SSH
 # --------------------------
 echo "== 配置 SSH（允许密码登录、root 登录、端口 44443） =="
@@ -51,7 +68,6 @@ deb http://archive.debian.org/debian buster main contrib non-free
 deb http://archive.debian.org/debian buster-updates main contrib non-free
 deb http://archive.debian.org/debian-security buster/updates main contrib non-free
 EOF
-    # 禁用 Valid-Until 校验
     echo 'Acquire::Check-Valid-Until "false";' >/etc/apt/apt.conf.d/99ignore-valid-until
     ;;
   11)
@@ -79,16 +95,8 @@ echo "== 安装常用工具 =="
 apt-get install -y curl wget zip unzip iperf3 dnsutils screen
 
 # --------------------------
-# 5. 安装 Docker (10 秒倒计时自动执行)
+# 5. 安装 Docker
 # --------------------------
-echo "== 是否安装 Docker 环境？ =="
-echo "   1) 安装"
-echo "   2) 跳过"
-echo -n "请输入选择 [默认 1，10 秒后自动安装]: "
-
-read -t 10 choice_docker || choice_docker=1
-[ -z "$choice_docker" ] && choice_docker=1
-
 if [ "$choice_docker" = "1" ]; then
     echo "开始安装 Docker..."
     apt-get install -y apt-transport-https ca-certificates gnupg lsb-release
@@ -103,16 +111,8 @@ else
 fi
 
 # --------------------------
-# 6. 编译安装 Python3.11 (10 秒倒计时自动执行)
+# 6. 编译安装 Python3.11
 # --------------------------
-echo "== 是否编译安装 Python3.11 + pip3？ =="
-echo "   1) 安装"
-echo "   2) 跳过"
-echo -n "请输入选择 [默认 1，10 秒后自动安装]: "
-
-read -t 10 choice_py || choice_py=1
-[ -z "$choice_py" ] && choice_py=1
-
 if [ "$choice_py" = "1" ]; then
     echo "开始安装 Python3.11..."
     apt-get install -y build-essential libssl-dev zlib1g-dev \
@@ -129,7 +129,6 @@ if [ "$choice_py" = "1" ]; then
 
     echo "Python3.11 安装完成"
 
-    # 处理软链接，兼容已有 python3
     if command -v python3 &>/dev/null; then
         mv /usr/bin/python3 /usr/bin/python3.bak.$(date +%s)
     fi
