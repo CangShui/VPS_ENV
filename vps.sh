@@ -1,6 +1,21 @@
 #!/bin/bash
 set -e
 
+is_lxc_container() {
+    # 方法1：看 PID 1 的环境变量里是否有 container=lxc
+    if tr '\0' '\n' < /proc/1/environ 2>/dev/null | grep -q '^container=lxc$'; then
+        return 0
+    fi
+
+    # 方法2：看 cgroup 路径中是否带有 lxc
+    if grep -qa 'lxc' /proc/self/cgroup 2>/dev/null; then
+        return 0
+    fi
+
+    return 1
+}
+
+
 echo "== 开始 VPS 初始化 =="
 
 # --------------------------
@@ -40,7 +55,10 @@ echo "SSH 已重启，端口改为 44443"
 # --------------------------
 echo "== 开启 TCP BBR =="
 
-cat <<EOF >/etc/sysctl.d/99-bbr.conf
+if is_lxc_container; then
+    echo "检测到当前运行在 LXC 容器内，跳过 BBR 配置（由宿主机负责）"
+else
+    cat <<EOF >/etc/sysctl.d/99-bbr.conf
 # 启用 BBR 拥塞控制
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
@@ -56,12 +74,14 @@ net.ipv4.ip_forward = 1
 net.ipv6.conf.all.forwarding = 1
 EOF
 
-sysctl --system >/dev/null
-if sysctl net.ipv4.tcp_congestion_control | grep -q bbr; then
-    echo "BBR 启用成功 ✅"
-else
-    echo "BBR 启用失败 ❌"
+    sysctl --system >/dev/null
+    if sysctl net.ipv4.tcp_congestion_control | grep -q bbr; then
+        echo "BBR 启用成功 ✅"
+    else
+        echo "BBR 启用失败 ❌"
+    fi
 fi
+
 
 # --------------------------
 # 3. 更换 APT 源
